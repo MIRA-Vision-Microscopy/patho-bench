@@ -11,8 +11,24 @@ _test*/
 _deprecated*
 _tutorial*/
 *_.yaml
+experiments/
 
 *.pt
 *.pth
 *.bin
 tf_logs/
+
+
+
+### VisualStudioCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+**/.vscode
+
+### Mac Stuff
+.DS_Store
+
