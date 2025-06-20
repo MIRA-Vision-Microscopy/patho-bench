@@ -1,0 +1,5 @@
+mag: 20
+patch_size: 512
+overlap: 0
+min_tissue_proportion: 0.0
+coords_dir: null

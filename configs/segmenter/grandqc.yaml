@@ -1,0 +1,6 @@
+model_name: grandqc
+seg_conf_thresh: 0.4
+remove_holes: true
+remove_artifacts: true
+remove_penmarks: false
+seg_batch_size: 32

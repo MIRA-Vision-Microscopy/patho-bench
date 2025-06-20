@@ -1,0 +1,21 @@
+defaults:
+  - hydra: default
+  - features: default
+  - patching: default
+  - segmenter: default
+  - task: default
+  - encoder: patch
+  - override encoder/patch_encoder: virchow2
+
+device: mps
+job_dir: malaria
+wsi_dir: /Volumes/Data/SPRIND/malaria/NIH/images/polygon set
+wsi_ext: null
+custom_mpp_keys: null
+custom_list_of_wsis: /Volumes/Data/SPRIND/malaria/NIH/images/polygon-tmp.csv
+reader_type: null
+search_nested: false
+wsi_cache: null
+cache_batch_size: 32
+max_workers: null
+skip_errors: false

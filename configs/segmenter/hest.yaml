@@ -1,0 +1,6 @@
+model_name: hest
+seg_conf_thresh: 0.5
+remove_holes: false
+remove_artifacts: false
+remove_penmarks: false
+seg_batch_size: null

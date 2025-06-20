@@ -1,0 +1,9 @@
+run:
+  dir: experiments/${job_dir}
+job_logging:
+  root:
+    level: INFO
+  handlers:
+    file:
+      class: logging.FileHandler
+      filename: ${hydra.run.dir}/hydra.log
