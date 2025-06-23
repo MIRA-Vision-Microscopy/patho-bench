@@ -34,7 +34,7 @@ def _run_segmentation(processor: Processor, cfg: DictConfig):
             seg_mag=segmentation_model.target_mag,
             holes_are_tissue=not cfg.segmenter.remove_holes,
             artifact_remover_model=artifact_remover_model,
-            batch_size=cfg.segmenter.seg_batch_size or cfg.features.batch_size,
+            batch_size=cfg.segmenter.seg_batch_size or cfg.batch_size,
             device=cfg.device
         )
 
@@ -49,23 +49,23 @@ def _run_coordinate_extraction(processor: Processor, cfg: DictConfig):
 
 
 def _run_feature_extraction(processor: Processor, cfg: DictConfig):
-    if cfg.encoder.type == 'slide':
+    if cfg.features.type == 'slide':
         from trident.slide_encoder_models.load import encoder_factory
-        encoder = encoder_factory(cfg.encoder.slide_encoder.backbone)
+        encoder = encoder_factory(cfg.features.slide_encoder.backbone)
         processor.run_slide_feature_extraction_job(
             slide_encoder=encoder,
             coords_dir=cfg.patching.coords_dir or f'{cfg.patching.mag}x_{cfg.patching.patch_size}px_{cfg.patching.overlap}px_overlap',
             device=cfg.device,
             saveas='h5',
-            batch_limit=cfg.features.feat_batch_size or cfg.features.batch_size,
+            batch_limit=cfg.features.feat_batch_size or cfg.batch_size,
         )
     else:
         from trident.patch_encoder_models.load import encoder_factory
-        encoder = encoder_factory(cfg.encoder.patch_encoder.backbone, weights_path=cfg.encoder.patch_encoder.ckpt_path)
+        encoder = encoder_factory(cfg.features.patch_encoder.backbone, weights_path=cfg.features.patch_encoder.ckpt_path)
         processor.run_patch_feature_extraction_job(
             coords_dir=cfg.patching.coords_dir or f'{cfg.patching.mag}x_{cfg.patching.patch_size}px_{cfg.patching.overlap}px_overlap',
             patch_encoder=encoder,
             device=cfg.device,
             saveas='h5',
-            batch_limit=cfg.features.feat_batch_size or cfg.features.batch_size,
+            batch_limit=cfg.features.feat_batch_size or cfg.batch_size,
         )
