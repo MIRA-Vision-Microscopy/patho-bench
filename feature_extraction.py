@@ -31,7 +31,7 @@ def _initialize_processor(cfg: DictConfig):
         custom_mpp_keys=cfg.custom_mpp_keys,
         custom_list_of_wsis=cfg.custom_list_of_wsis,
         max_workers=cfg.max_workers,
-        reader_type=cfg.reader_type,
+        reader_type=cfg.reader.reader_type,
         search_nested=cfg.search_nested,
     )
 
