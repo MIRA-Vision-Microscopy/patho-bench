@@ -1,10 +1,10 @@
 defaults:
   - hydra: default
-  - features: default
+  - reader: default
   - patching: default
   - segmenter: hest
   - task: seg
-  - encoder: patch
+  - features: patch
 
 device: cuda
 job_dir: outputs
@@ -12,8 +12,8 @@ wsi_dir: data/wsi
 wsi_ext: [svs, ndpi, tiff]
 custom_mpp_keys: null
 custom_list_of_wsis: null
-reader_type: null
 search_nested: false
+batch_size: 64
 wsi_cache: null
 cache_batch_size: 32
 max_workers: null

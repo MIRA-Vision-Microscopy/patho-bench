@@ -1,4 +1,0 @@
-defaults: 
-  - patch_encoder: conch_v15
-
-type: patch

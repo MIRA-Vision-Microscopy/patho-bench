@@ -1,0 +1,6 @@
+defaults: 
+  - patch_encoder: conch_v15
+  - patch_encoder_ckpt_path: null
+
+type: patch
+feat_batch_size: null

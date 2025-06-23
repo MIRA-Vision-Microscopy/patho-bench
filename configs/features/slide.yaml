@@ -1,0 +1,6 @@
+defaults: 
+  - slide_encoder: mean-virchow
+  - slide_encoder_ckpt_path: null
+
+type: slide
+feat_batch_size: null

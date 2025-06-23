@@ -1,4 +1,0 @@
-defaults: 
-  - slide_encoder: mean-virchow
-
-type: slide
