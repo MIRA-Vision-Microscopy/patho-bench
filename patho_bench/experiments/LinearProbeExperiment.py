@@ -4,6 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from patho_bench.datasets.BaseDataset import BaseDataset
 from patho_bench.experiments.utils.ClassificationMixin import ClassificationMixin
 from patho_bench.experiments.BaseExperiment import BaseExperiment
+from einops import rearrange, repeat
 import json
 
 """
@@ -20,6 +21,7 @@ class LinearProbeExperiment(ClassificationMixin, BaseExperiment):
                  max_iter: int,
                  balanced_class_weights: bool,
                  results_dir: str,
+                 patch_aggregation: str, 
                  **kwargs
                  ):
         '''
@@ -34,6 +36,7 @@ class LinearProbeExperiment(ClassificationMixin, BaseExperiment):
             max_iter (int): Maximum number of iterations for logistic regression
             balanced_class_weights (bool): Whether to use balanced class weights
             results_dir (str): Path to save results,
+            patch_aggregation (str): Method to aggregate patches of same patient (either 'stack' or 'concat')
             **kwargs: Additional arguments to save in config.json
         '''
         self.dataset = dataset
@@ -44,6 +47,7 @@ class LinearProbeExperiment(ClassificationMixin, BaseExperiment):
         self.max_iter = max_iter
         self.balanced_class_weights = balanced_class_weights
         self.results_dir = results_dir
+        self.patch_aggregation = patch_aggregation
         self.set_seed(seed=0)
         
         # Set kwargs as extra attributes for saving in config.json
@@ -65,7 +69,18 @@ class LinearProbeExperiment(ClassificationMixin, BaseExperiment):
             all_train_samples = next(iter(train_dataloader))
 
             loop.set_description(f'Training on {len(all_train_samples["labels"][self.task_name])} samples')
-            assert len(all_train_samples['slide']['features'].shape) == 2, f'Features must be 2-dimensional (num_samples x feature_dim), got shape: {all_train_samples["slide"]["features"].shape}'
+            #assert len(all_train_samples['slide']['features'].shape) == 2, f'Features must be 2-dimensional (num_samples x feature_dim), got shape: {all_train_samples["slide"]["features"].shape}'
+            features = all_train_samples['slide']['features'][0]
+            if len(features.shape) > 2:
+                if self.patch_aggregation == 'stack':
+                    labels = repeat(all_train_samples['labels'][self.task_name], 'n -> n m', m=features.shape[1])
+                    all_train_samples['labels'][self.task_name] = rearrange(labels, 'n m -> (n m)')
+                    all_train_samples['slide']['features'] = rearrange(features, 'n m c -> (n m) c')
+                elif self.patch_aggregation == 'concat':
+                    all_train_samples['slide']['features'] = rearrange(features, 'n m c -> n (m c)')
+                else:
+                    raise ValueError(f"No valid patch aggregation strategy defined.")
+
             embedding_dim = all_train_samples['slide']['features'].shape[1]
             
             model = LogisticRegression(
@@ -119,6 +134,16 @@ class LinearProbeExperiment(ClassificationMixin, BaseExperiment):
             # Get labels and predictions
             loop.set_description(f'Running {split} split on {len(all_eval_samples["labels"][self.task_name])} samples')
             labels = all_eval_samples['labels'][self.task_name] # Shape: (num_samples,)
+            features = all_eval_samples['slide']['features'][0]
+            if len(features.shape) > 2:
+                if self.patch_aggregation == 'stack':
+                    labels = repeat(labels, 'n -> n m', m=features.shape[1])
+                    labels = rearrange(labels, 'n m -> (n m)')
+                    all_eval_samples['slide']['features'] = rearrange(features, 'n m c -> (n m) c')
+                elif self.patch_aggregation == 'concat':
+                    all_eval_samples['slide']['features'] = rearrange(features, 'n m c -> n (m c)')
+                else:
+                    raise ValueError(f"No valid patch aggregation strategy defined.")
             preds = self.models[self.current_iter].predict_proba(all_eval_samples['slide']['features'])
 
             # Decide whether to report per-fold results (mean ± SD) or bootstrapped results (95% CI)

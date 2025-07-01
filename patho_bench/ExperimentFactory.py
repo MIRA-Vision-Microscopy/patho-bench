@@ -40,7 +40,8 @@ class ExperimentFactory:
                  patch_embeddings_dirs: list[str] = None,
                  model_name: str = None,
                  model_kwargs: dict = {},
-                 num_bootstraps: int = 100): 
+                 num_bootstraps: int = 100,
+                 patch_aggregation: str = None): 
         '''
         Create linear probe experiment using slide-level embeddings.
         
@@ -81,7 +82,8 @@ class ExperimentFactory:
             cost=cost,
             max_iter=10000,
             balanced_class_weights=balanced,
-            results_dir=saveto
+            results_dir=saveto, 
+            patch_aggregation = patch_aggregation
         )
 
         if external_split is None:
