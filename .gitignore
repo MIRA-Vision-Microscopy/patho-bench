@@ -11,6 +11,7 @@ _test*/
 _deprecated*
 _tutorial*/
 *_.yaml
+experiments/
 
 *.pt
 *.pth

@@ -4,16 +4,17 @@ defaults:
   - patching: default
   - segmenter: default
   - task: default
+  - probing: default
   - features: patch
   - override features/patch_encoder: virchow2
 
 device: mps
-job_dir: malaria
-wsi_dir: /Volumes/Data/SPRIND/malaria/NIH/images/polygon set
+job_dir: cervical
+wsi_dir: /Volumes/Data/SPRIND/cervical cancer/Mendeley LBC
 wsi_ext: null
 custom_mpp_keys: null
-custom_list_of_wsis: /Volumes/Data/SPRIND/malaria/NIH/images/polygon-tmp.csv
-search_nested: false
+custom_list_of_wsis: /Users/frauke-mira/Documents/cervical.csv
+search_nested: true
 batch_size: 64
 wsi_cache: null
 cache_batch_size: 32
