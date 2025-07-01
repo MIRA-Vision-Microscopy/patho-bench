@@ -1,0 +1,4 @@
+config_path: /Users/frauke-mira/VSC/patho-bench/cervical.yaml
+combine_slides_per_patient: false
+aggregate: concat
+model: titan
