@@ -55,7 +55,7 @@
 | `slide_encoder`           | Slide encoder. One of `threads`, `titan`, `prism`, `gigapath`, `chief`, `madeleine`, `mean-virchow`, `mean-virchow2`, `mean-conch_v1`, `mean-conch_v15`, `mean-ctranspath`, `mean-gigapath`, `mean-resnet50`, `mean-hoptimus0`, `mean-phikon`, `mean-phikon_v2`, `mean-musk`, `mean-uni_v1`, `mean-uni_v2`.                                                                                     | `None`      |
 | `slide_encoder_ckpt_path` | Optional local path to a slide encoder checkpoint (.pt, .pth, .bin, or .safetensors).            | `None`      |
 
-
+[Back to README.md](README.md)
 
 
 
