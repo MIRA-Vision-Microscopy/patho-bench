@@ -60,7 +60,7 @@ class AgataSlideEncoder(BaseSlideEncoder):
             in_features: int,
             layer1_out_features: int,
             layer2_out_features: int,
-            activation: nn.Module,
+            activation: nn.Module = torch.nn.GELU(),
             label_name_fclayer_head_config: Mapping[str, FCHeadConfig] = None,
             scaled_attention: bool = False,
             absolute_attention: bool = False,
