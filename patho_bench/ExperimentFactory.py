@@ -13,7 +13,10 @@ from patho_bench.DatasetFactory import DatasetFactory
 from patho_bench.helpers.GPUManager import GPUManager
 from patho_bench.optim.NLLSurvLoss import NLLSurvLoss
 from sklearn.utils.class_weight import compute_class_weight
-from trident.slide_encoder_models.load import encoder_factory
+# rename import so we can reuse "encoder_factory" later and do not need to change much
+from trident.slide_encoder_models.load import encoder_factory as _upstream_factory
+# import our own slide encoder models
+from mira_utils.custom_slide_encoder_models import custom_encoder_factory, _CUSTOM_ENCODERS
 
 """
 This file contains the ExperimentFactory class which is responsible for instantiating the appropriate experiment object.
@@ -21,6 +24,20 @@ This file contains the ExperimentFactory class which is responsible for instanti
 
 COMBINE_TRAIN_VAL = False
 TEST_EXTERNAL_ONLY = True
+
+
+
+def encoder_factory(model_name, *, pretrained=True, freeze=False, **model_kwargs):
+    """
+    If the name matches your new encoder, return it;
+    otherwise defer to the original trident factory.
+    """
+    if model_name in _CUSTOM_ENCODERS:
+        # instantiate instantiate our custom encoders
+        return custom_encoder_factory(model_name, pretrained=pretrained, freeze=freeze, **model_kwargs)
+    else:
+        # everything else comes from the real factory
+        return _upstream_factory(model_name, pretrained=pretrained, freeze=freeze, **model_kwargs)
 
 class ExperimentFactory:
                 
