@@ -3,6 +3,7 @@ class GeneralizabilityExperimentWrapper:
                  base_experiment,
                  external_dataset,
                  test_external_only: bool,
+                 validate_external: bool,
                  saveto: str,
                  ):
         '''
@@ -20,6 +21,7 @@ class GeneralizabilityExperimentWrapper:
         self.exp = base_experiment
         self.external_dataset = external_dataset
         self.test_external_only = test_external_only
+        self.validate_external = validate_external
         self.saveto = saveto
         
         if test_external_only:
@@ -43,6 +45,8 @@ class GeneralizabilityExperimentWrapper:
             
         self.exp.dataset = self.external_dataset         # Switch to external dataset
         self.exp.results_dir = self.saveto # Save testing artifacts to external directory
+        if self.validate_external:
+            self.exp.validate()
         self.exp.test() # Test on external dataset
         
     def report_results(self, metric: str):

@@ -246,5 +246,5 @@ class BaseDataset(torch.utils.data.Dataset, ConfigMixin):
         return torch.utils.data.DataLoader(subset_dataset,
                                             batch_size = len(subset_dataset) if batch_size is None else batch_size,
                                             sampler = subset_dataset.get_datasampler('random'),
-                                            num_workers = 4,
+                                            num_workers = 0,
                                             collate_fn = subset_dataset.collate_fn)
