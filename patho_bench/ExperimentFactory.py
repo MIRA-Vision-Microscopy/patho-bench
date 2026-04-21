@@ -54,10 +54,13 @@ class ExperimentFactory:
                  external_split: str = None,
                  external_pooled_embeddings_dir: str = None,
                  external_saveto: str = None,
+                 validate_external: bool = False,
+                 preserve_external_folds: bool = False,
                  patch_embeddings_dirs: list[str] = None,
                  model_name: str = None,
                  model_kwargs: dict = {},
                  num_bootstraps: int = 100,
+                 bag_size: int = None,
                  patch_aggregation: str = None): 
         '''
         Create linear probe experiment using slide-level embeddings.
@@ -74,10 +77,13 @@ class ExperimentFactory:
             external_split: str, path to local split file for external testing.
             external_pooled_embeddings_dir: str, path to folder containing pooled embeddings for external testing. Only needed if external_split is not None.
             external_saveto: str, path to save the results of external testing. Only needed if external_split is not None.
+            validate_external: bool, whether to run validation on the external dataset before testing.
+            preserve_external_folds: bool, whether to preserve fold assignments already present in the external split file.
             patch_embeddings_dirs: list of str, paths to folder(s) containing patch embeddings for given experiment. Only needed if pooled_embeddings_dir is empty.
             model_name: str, name of the model to use for pooling. Only needed if pooled_embeddings_dir is empty.
             model_kwargs: dict, additional arguments to pass to the model constructor. Only needed if pooled_embeddings_dir is empty.
             num_bootstraps: int, number of bootstraps. Default is 100.
+            bag_size: int or None, fixed number of patches sampled per slide.
         '''
         _, task_info, internal_dataset = ExperimentFactory._prepare_internal_dataset(split_path=split,
                                                                                     task_config=task_config,
@@ -88,6 +94,7 @@ class ExperimentFactory:
                                                                                     pooled_embeddings_dir=pooled_embeddings_dir,
                                                                                     model_name=model_name,
                                                                                     model_kwargs=model_kwargs,
+                                                                                    bag_size=bag_size,
                                                                                     gpu=gpu)
         
         # Initialize experiment
@@ -106,13 +113,16 @@ class ExperimentFactory:
         if external_split is None:
             return experiment
         else:
+            external_num_folds = 1 if TEST_EXTERNAL_ONLY and not preserve_external_folds else internal_dataset.num_folds
             external_dataset = ExperimentFactory._prepare_external_dataset(
-                external_split, task_config, internal_dataset.num_folds, patch_embeddings_dirs,
-                combine_slides_per_patient, external_pooled_embeddings_dir, model_name, model_kwargs, gpu)
+                external_split, task_config, external_num_folds, patch_embeddings_dirs,
+                combine_slides_per_patient, external_pooled_embeddings_dir, model_name, model_kwargs, bag_size, gpu,
+                preserve_folds=preserve_external_folds)
             return GeneralizabilityExperimentWrapper(
                 experiment,
                 external_dataset=external_dataset,
                 test_external_only=TEST_EXTERNAL_ONLY,
+                validate_external=validate_external,
                 saveto=external_saveto
             )
     
@@ -542,13 +552,15 @@ class ExperimentFactory:
                                   model_name: str = None,
                                   model_kwargs: dict = {},
                                   bag_size: int = None,
-                                  gpu: int = -1):
+                                  gpu: int = -1,
+                                  preserve_folds: bool = False):
         """
         Helper method to prepare the external dataset (all test) from slide or patch embeddings for generalizability experiments.
         """
         external_split, task_info = SplitFactory.from_local(external_split_path, task_config)
-        external_split.remove_all_folds()
-        external_split.assign_folds(num_folds=internal_num_folds, test_frac=1, val_frac=0, method='monte-carlo')  # Reassign all samples to test
+        if not preserve_folds:
+            external_split.remove_all_folds()
+            external_split.assign_folds(num_folds=internal_num_folds, test_frac=1, val_frac=0, method='monte-carlo')  # Reassign all samples to test
         
         if external_pooled_embeddings_dir is not None:
             return DatasetFactory.from_slide_embeddings(
